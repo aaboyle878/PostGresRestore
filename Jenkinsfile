@@ -2,7 +2,7 @@ pipeline {
     agent any
     parameters {
         string(name: 'AWS_REGION', defaultValue: 'us-east-1', description: 'Region of the S3 bucket')
-        string(name: 'EC2_REGION', defaultValue: 'us-east-1', description: 'Region of the EC2 instance')
+        string(name: 'EC2_REGION', defaultValue: 'eu-west-1', description: 'Region of the EC2 instance')
         string(name: 'S3_BUCKET', defaultValue: 'statefile-remote-be', description: 'Name of the S3 bucket')
         string(name: 'EC2_HOST', defaultValue: 'ec2-63-33-156-75.eu-west-1.compute.amazonaws.com', description: 'EC2 instance hostname or IP')
         string(name: 'NETWORK', defaultValue: 'Mainnet', description: 'Name of Instance we are restoring from')
