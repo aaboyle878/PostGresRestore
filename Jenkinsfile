@@ -114,12 +114,12 @@ pipeline {
                         sudo tar -xzf \\${RESTORE_DIR}/pg_wal.tar.gz -C \\${DATA_DIR}/pg_wal && \
                         sudo chown -R postgres:postgres \\${DATA_DIR} && echo "Data directory replaced." && \
                         sudo rm -rf \\${LEDGER_DIR}/* && \
-                        sudo cp \\${RESTORE_DIR}/gsm \\${LEDGER_DIR}/ && \
-                        sudo cp \\${RESTORE_DIR}/immutable \\${LEDGER_DIR}/ && \
-                        sudo cp \\${RESTORE_DIR}/ledger \\${LEDGER_DIR}/ && \
+                        sudo cp -r \\${RESTORE_DIR}/gsm \\${LEDGER_DIR}/ && \
+                        sudo cp -r \\${RESTORE_DIR}/immutable \\${LEDGER_DIR}/ && \
+                        sudo cp -r \\${RESTORE_DIR}/ledger \\${LEDGER_DIR}/ && \
                         sudo cp \\${RESTORE_DIR}/lock \\${LEDGER_DIR}/ && \
                         sudo cp \\${RESTORE_DIR}/protocolMagicId \\${LEDGER_DIR}/ && \
-                        sudo cp \\${RESTORE_DIR}/volatile \\${LEDGER_DIR}/ '
+                        sudo cp -r \\${RESTORE_DIR}/volatile \\${LEDGER_DIR}/ '
                         """
                     }
                 }
