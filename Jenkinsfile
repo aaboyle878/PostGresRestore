@@ -120,7 +120,7 @@ pipeline {
                         sudo cp \\${RESTORE_DIR}/lock \\${LEDGER_DIR}/ && \
                         sudo cp \\${RESTORE_DIR}/protocolMagicId \\${LEDGER_DIR}/ && \
                         sudo cp -r \\${RESTORE_DIR}/volatile \\${LEDGER_DIR}/ && \
-                        chown -R ubuntu:ubuntu \\${LEDGER_DIR} '
+                        sudo chown -R ubuntu:ubuntu \\${LEDGER_DIR} '
                         """
                     }
                 }
