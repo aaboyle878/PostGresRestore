@@ -35,33 +35,18 @@ pipeline {
                 }
             }
         }
+        stages {
         stage('Check and Clean Directories') {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} << 'EOF'
-                    set -e
-                    echo 'Checking and cleaning directories...'
-
-                    # Ensure restore directory exists
-                    sudo mkdir -p ${RESTORE_DIR}
-                    sudo chmod -R 755 ${RESTORE_DIR}
-
-                    # Clean restore directory if it has files
-                    if [ -d "${RESTORE_DIR}" ] && [ "\$(ls -A ${RESTORE_DIR})" ]; then
-                        sudo rm -rf ${RESTORE_DIR}/*
-                        echo 'Restore directory cleaned.'
-                    fi
-
-                    # Ensure data directory exists and clean it
-                    sudo mkdir -p ${DATA_DIR}
-                    sudo chmod -R 755 ${DATA_DIR}
-                    if [ -d "${DATA_DIR}" ] && [ "\$(ls -A ${DATA_DIR})" ]; then
-                        sudo rm -rf ${DATA_DIR}/*
-                        echo 'Data directory cleaned.'
-                    fi
-
-                    EOF
+                    ssh ubuntu@${EC2_HOST} 'mkdir -p ${RESTORE_DIR} && \
+                    if [ -d ${RESTORE_DIR} ] && [ "$(ls -A ${RESTORE_DIR})" ]; then \
+                        rm -rf ${RESTORE_DIR}/* && echo "Restore directory cleaned.";\
+                    fi && \
+                    if [ -d ${DATA_DIR} ] && [ "$(ls -A ${DATA_DIR})" ]; then \
+                        sudo rm -rf ${DATA_DIR}/* && echo "Data directory cleaned.";\
+                    fi'
                     """
                 }
             }
@@ -71,12 +56,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(3) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} <<'EOF'
-                        set -e
-                        echo 'Downloading backup tarball...'
-                        aws s3 cp s3://${S3_BUCKET}/${NETWORK}/${BACKUP_FILE}.tar.gz /tmp/
-                        echo 'Backup tarball downloaded.'
-                        EOF
+                        ssh ubuntu@${EC2_HOST} 'aws s3 cp s3://${S3_BUCKET}/${NETWORK}/${BACKUP_FILE}.tar.gz /tmp/ && echo "Backup tarball downloaded."'
                         """
                     }
                 }
@@ -87,13 +67,8 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(2) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} <<'EOF'
-                        set -e
-                        echo 'Extracting backup tarball...'
-                        mkdir -p ${RESTORE_DIR}
-                        tar -xzf /tmp/${BACKUP_FILE}.tar.gz -C ${RESTORE_DIR}
-                        echo 'Backup tarball extracted.'
-                        EOF
+                        ssh ubuntu@${EC2_HOST} 'mkdir -p ${RESTORE_DIR} && \
+                        tar -xzf /tmp/${BACKUP_FILE}.tar.gz -C ${RESTORE_DIR} && echo "Backup tarball extracted."'
                         """
                     }
                 }
@@ -103,12 +78,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<'EOF'
-                    set -e
-                    echo 'Stopping PostgreSQL service...'
-                    sudo systemctl stop postgresql
-                    echo 'PostgreSQL service stopped.'
-                    EOF
+                    ssh ubuntu@${EC2_HOST} 'sudo systemctl stop postgresql && echo "PostgreSQL service stopped."'
                     """
                 }
             }
@@ -118,14 +88,9 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(2) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} <<'EOF'
-                        set -e
-                        echo 'Restoring data directory...'
-                        sudo rm -rf ${DATA_DIR}/*
-                        sudo cp -R ${RESTORE_DIR}/* ${DATA_DIR}
-                        sudo chown -R postgres:postgres ${DATA_DIR}
-                        echo 'Data directory replaced.'
-                        EOF
+                        ssh ubuntu@${EC2_HOST} 'sudo rm -rf ${DATA_DIR}/* && \
+                        sudo cp -R ${RESTORE_DIR}/* ${DATA_DIR} && \
+                        sudo chown -R postgres:postgres ${DATA_DIR} && echo "Data directory replaced."'
                         """
                     }
                 }
@@ -135,12 +100,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<'EOF'
-                    set -e
-                    echo 'Starting PostgreSQL service...'
-                    sudo systemctl start postgresql
-                    echo 'PostgreSQL service started.'
-                    EOF
+                    ssh ubuntu@${EC2_HOST} 'sudo systemctl start postgresql && echo "PostgreSQL service started."'
                     """
                 }
             }
@@ -149,26 +109,16 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<'EOF'
-                    set -e
-                    echo 'Verifying restoration...'
-                    psql -U postgres -c 'SELECT 1;'
-                    echo 'Database restoration verified.'
-                    EOF
+                    ssh ubuntu@${EC2_HOST} 'psql -U postgres -c "SELECT 1;" && echo "Database restoration verified."'
                     """
                 }
             }
         }
         stage('Start DB-Sync Service') {
-            steps {
+            steps{
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<'EOF'
-                    set -e
-                    echo 'Restarting DB-Sync service...'
-                    sudo systemctl restart cnode-dbsync.service
-                    echo 'DB-Sync service has been restarted.'
-                    EOF
+                    ssh ubuntu@${EC2_HOST} 'sudo systemctl restart cnode-dbsync.service && echo "DB-Sync service has been restarted."'
                     """
                 }
             }
@@ -213,14 +163,7 @@ pipeline {
         }
         always {
             sshagent(credentials: ['SSH_KEY_CRED']) {
-                sh """
-                ssh ubuntu@${EC2_HOST} <<'EOF'
-                set -e
-                echo 'Cleaning up temporary files...'
-                rm -rf ${RESTORE_DIR} /tmp/${BACKUP_FILE}.tar.gz
-                echo 'Cleanup complete.'
-                EOF
-                """
+                sh "ssh ubuntu@${EC2_HOST} 'rm -rf ${RESTORE_DIR} /tmp/${BACKUP_FILE}.tar.gz'"
             }
         }
     }
