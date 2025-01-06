@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         RESTORE_DIR = "/tmp/postgres_restore"
-        DATA_DIR = "/var/lib/postgresql/16/main/"
+        DATA_DIR = "/opt/cardano/cnode/guild-db/pgdb/"
     }
     stages {
         stage('Retrieve Secrets') {
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<EOF
+                    ssh ubuntu@${EC2_HOST} <<'EOF'
                     set -e
                     echo 'Checking and cleaning directories...'
                     sudo mkdir -p ${RESTORE_DIR}
@@ -60,7 +60,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(3) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} <<EOF
+                        ssh ubuntu@${EC2_HOST} <<'EOF'
                         set -e
                         echo 'Downloading backup tarball...'
                         aws s3 cp s3://${S3_BUCKET}/${NETWORK}/${BACKUP_FILE}.tar.gz /tmp/
@@ -76,7 +76,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(2) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} <<EOF
+                        ssh ubuntu@${EC2_HOST} <<'EOF'
                         set -e
                         echo 'Extracting backup tarball...'
                         mkdir -p ${RESTORE_DIR}
@@ -92,7 +92,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<EOF
+                    ssh ubuntu@${EC2_HOST} <<'EOF'
                     set -e
                     echo 'Stopping PostgreSQL service...'
                     sudo systemctl stop postgresql
@@ -107,7 +107,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(2) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} <<EOF
+                        ssh ubuntu@${EC2_HOST} <<'EOF'
                         set -e
                         echo 'Restoring data directory...'
                         sudo rm -rf ${DATA_DIR}/*
@@ -124,7 +124,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<EOF
+                    ssh ubuntu@${EC2_HOST} <<'EOF'
                     set -e
                     echo 'Starting PostgreSQL service...'
                     sudo systemctl start postgresql
@@ -138,7 +138,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<EOF
+                    ssh ubuntu@${EC2_HOST} <<'EOF'
                     set -e
                     echo 'Verifying restoration...'
                     psql -U postgres -c 'SELECT 1;'
@@ -152,7 +152,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<EOF
+                    ssh ubuntu@${EC2_HOST} <<'EOF'
                     set -e
                     echo 'Restarting DB-Sync service...'
                     sudo systemctl restart cnode-dbsync.service
@@ -203,7 +203,7 @@ pipeline {
         always {
             sshagent(credentials: ['SSH_KEY_CRED']) {
                 sh """
-                ssh ubuntu@${EC2_HOST} <<EOF
+                ssh ubuntu@${EC2_HOST} <<'EOF'
                 set -e
                 echo 'Cleaning up temporary files...'
                 rm -rf ${RESTORE_DIR} /tmp/${BACKUP_FILE}.tar.gz
