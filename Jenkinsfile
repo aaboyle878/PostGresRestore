@@ -19,7 +19,8 @@ pipeline {
                     string(credentialsId: 'INSTANCE_ID', variable: 'INSTANCE_ID'),
                     string(credentialsId: 'NETWORK', variable: 'NETWORK'),
                     string(credentialsId: 'SLACK', variable: 'SLACK'),
-                    string(credentialsId: 'IAM_ROLE', variable: 'IAM_ROLE')
+                    string(credentialsId: 'IAM_ROLE', variable: 'IAM_ROLE'),
+                    string(credentialsId: 'PG_PASS', variable: 'PG_PASS')
                 ]) {
                     script {
                         // Set environment variables so they are available throughout the pipeline
@@ -31,6 +32,7 @@ pipeline {
                         env.NETWORK = "${NETWORK}"
                         env.SLACK = "${SLACK}"
                         env.IAM_ROLE = "${IAM_ROLE}"
+                        env.PG_PASS = "${PG_PASS}"
                     }
                 }
             }
@@ -86,7 +88,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} 'source .bashrc && ./git/cardano-db-sync/scripts/postgresql-setup.sh --createdb'
+                    ssh ubuntu@${EC2_HOST} 'export PGPASSFILE=${PG_PASS} && ./git/cardano-db-sync/scripts/postgresql-setup.sh --createdb'
                     """
                 }
             }
