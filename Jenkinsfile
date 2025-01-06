@@ -73,6 +73,24 @@ pipeline {
                 }
             }
         }
+        stage('Stop DB-Sync Service') {
+            steps {
+                sshagent(credentials: ['SSH_KEY_CRED']) {
+                    sh """
+                    ssh ubuntu@${EC2_HOST} 'sudo systemctl stop cnode-dbsync.service && echo "DB-Sync service stopped."'
+                    """
+                }
+            }
+        }
+        stage('Create DB') {
+            steps {
+                sshagent(credentials: ['SSH_KEY_CRED']) {
+                    sh """
+                    ssh ubuntu@${EC2_HOST} './git/cardano-db-sync/scripts/postgresql-setup.sh --createdb'
+                    """
+                }
+            }
+        }
         stage('Stop PostgreSQL Service') {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
