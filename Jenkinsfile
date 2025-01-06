@@ -108,7 +108,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} 'psql -U postgres -c "SELECT 1;" && echo "Database restoration verified."'
+                    ssh ubuntu@${EC2_HOST} 'psql postgres -c "SELECT 1;" && echo "Database restoration verified."'
                     """
                 }
             }
