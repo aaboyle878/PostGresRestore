@@ -38,18 +38,28 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} <<'EOF'
+                    ssh ubuntu@${EC2_HOST} << 'EOF'
                     set -e
                     echo 'Checking and cleaning directories...'
+
+                    # Ensure restore directory exists
                     sudo mkdir -p ${RESTORE_DIR}
+                    sudo chmod -R 755 ${RESTORE_DIR}
+
+                    # Clean restore directory if it has files
                     if [ -d ${RESTORE_DIR} ] && [ "\$(ls -A ${RESTORE_DIR})" ]; then
-                        rm -rf ${RESTORE_DIR}/*
+                        sudo rm -rf ${RESTORE_DIR}/*
                         echo 'Restore directory cleaned.'
                     fi
+
+                    # Ensure data directory exists and clean it
+                    sudo mkdir -p ${DATA_DIR}
+                    sudo chmod -R 755 ${DATA_DIR}
                     if [ -d ${DATA_DIR} ] && [ "\$(ls -A ${DATA_DIR})" ]; then
                         sudo rm -rf ${DATA_DIR}/*
                         echo 'Data directory cleaned.'
                     fi
+
                     EOF
                     """
                 }
