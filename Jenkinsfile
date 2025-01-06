@@ -6,6 +6,7 @@ pipeline {
     environment {
         RESTORE_DIR = "/tmp/postgres_restore"
         DATA_DIR = "/opt/cardano/cnode/guild-db/pgdb/"
+        SLACK_CHANNEL = '#jenkins-notifications'
     }
     stages {
         stage('Retrieve Secrets') {
