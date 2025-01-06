@@ -35,17 +35,16 @@ pipeline {
                 }
             }
         }
-        stages {
         stage('Check and Clean Directories') {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} 'mkdir -p ${RESTORE_DIR} && \
-                    if [ -d ${RESTORE_DIR} ] && [ "$(ls -A ${RESTORE_DIR})" ]; then \
-                        rm -rf ${RESTORE_DIR}/* && echo "Restore directory cleaned.";\
+                    ssh ubuntu@${EC2_HOST} 'mkdir -p \\${RESTORE_DIR} && \
+                    if [ -d \\${RESTORE_DIR} ] && [ "\\\$(ls -A \\${RESTORE_DIR})" ]; then \
+                        rm -rf \\${RESTORE_DIR}/* && echo "Restore directory cleaned.";\
                     fi && \
-                    if [ -d ${DATA_DIR} ] && [ "$(ls -A ${DATA_DIR})" ]; then \
-                        sudo rm -rf ${DATA_DIR}/* && echo "Data directory cleaned.";\
+                    if [ -d \\${DATA_DIR} ] && [ "\\\$(ls -A \\${DATA_DIR})" ]; then \
+                        sudo rm -rf \\${DATA_DIR}/* && echo "Data directory cleaned.";\
                     fi'
                     """
                 }
@@ -56,7 +55,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(3) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} 'aws s3 cp s3://${S3_BUCKET}/${NETWORK}/${BACKUP_FILE}.tar.gz /tmp/ && echo "Backup tarball downloaded."'
+                        ssh ubuntu@${EC2_HOST} 'aws s3 cp s3://\\${S3_BUCKET}/\\${NETWORK}/\\${BACKUP_FILE}.tar.gz /tmp/ && echo "Backup tarball downloaded."'
                         """
                     }
                 }
@@ -67,8 +66,8 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(2) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} 'mkdir -p ${RESTORE_DIR} && \
-                        tar -xzf /tmp/${BACKUP_FILE}.tar.gz -C ${RESTORE_DIR} && echo "Backup tarball extracted."'
+                        ssh ubuntu@${EC2_HOST} 'mkdir -p \\${RESTORE_DIR} && \
+                        tar -xzf /tmp/\\${BACKUP_FILE}.tar.gz -C \\${RESTORE_DIR} && echo "Backup tarball extracted."'
                         """
                     }
                 }
@@ -88,9 +87,9 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(2) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} 'sudo rm -rf ${DATA_DIR}/* && \
-                        sudo cp -R ${RESTORE_DIR}/* ${DATA_DIR} && \
-                        sudo chown -R postgres:postgres ${DATA_DIR} && echo "Data directory replaced."'
+                        ssh ubuntu@${EC2_HOST} 'sudo rm -rf \\${DATA_DIR}/* && \
+                        sudo cp -R \\${RESTORE_DIR}/* \\${DATA_DIR} && \
+                        sudo chown -R postgres:postgres \\${DATA_DIR} && echo "Data directory replaced."'
                         """
                     }
                 }
@@ -163,7 +162,7 @@ pipeline {
         }
         always {
             sshagent(credentials: ['SSH_KEY_CRED']) {
-                sh "ssh ubuntu@${EC2_HOST} 'rm -rf ${RESTORE_DIR} /tmp/${BACKUP_FILE}.tar.gz'"
+                sh "ssh ubuntu@${EC2_HOST} 'rm -rf \\${RESTORE_DIR} /tmp/\\${BACKUP_FILE}.tar.gz'"
             }
         }
     }
