@@ -66,7 +66,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(2) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} 'mkdir -p \\${RESTORE_DIR} && \
+                        ssh ubuntu@${EC2_HOST} 'sudo mkdir -p \\${RESTORE_DIR} && \
                         tar -xzf /tmp/\\${BACKUP_FILE}.tar.gz -C \\${RESTORE_DIR} && echo "Backup tarball extracted."'
                         """
                     }
