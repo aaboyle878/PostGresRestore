@@ -99,7 +99,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} 'sudo systemctl start postgresql && echo "PostgreSQL service started."'
+                    ssh ubuntu@${EC2_HOST} 'sudo systemctl restart postgresql && echo "PostgreSQL service started."'
                     """
                 }
             }
