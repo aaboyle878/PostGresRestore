@@ -7,6 +7,7 @@ pipeline {
         RESTORE_DIR = "/tmp/postgres_restore"
         DATA_DIR = "/opt/cardano/cnode/guild-db/pgdb/"
         SLACK_CHANNEL = '#jenkins-notifications'
+        LEDGER_DIR = "/opt/cardano/cnode/db"
     }
     stages {
         stage('Retrieve Secrets') {
@@ -111,7 +112,14 @@ pipeline {
                         sudo cp \\${RESTORE_DIR}/backup_manifest \\${DATA_DIR} && \
                         sudo tar -xzf \\${RESTORE_DIR}/base.tar.gz -C \\${DATA_DIR} && \
                         sudo tar -xzf \\${RESTORE_DIR}/pg_wal.tar.gz -C \\${DATA_DIR}/pg_wal && \
-                        sudo chown -R postgres:postgres \\${DATA_DIR} && echo "Data directory replaced."'
+                        sudo chown -R postgres:postgres \\${DATA_DIR} && echo "Data directory replaced." && \
+                        sudo rm -rf \\${LEDGER_DIR}/* && \
+                        sudo cp \\${RESTORE_DIR}/gsm \\${LEDGER_DIR}/ && \
+                        sudo cp \\${RESTORE_DIR}/immutable \\${LEDGER_DIR}/ && \
+                        sudo cp \\${RESTORE_DIR}/ledger \\${LEDGER_DIR}/ && \
+                        sudo cp \\${RESTORE_DIR}/lock \\${LEDGER_DIR}/ && \
+                        sudo cp \\${RESTORE_DIR}/protocolMagicId \\${LEDGER_DIR}/ && \
+                        sudo cp \\${RESTORE_DIR}/volatile \\${LEDGER_DIR}/ '
                         """
                     }
                 }
