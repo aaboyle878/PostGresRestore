@@ -48,7 +48,7 @@ pipeline {
                     sudo chmod -R 755 ${RESTORE_DIR}
 
                     # Clean restore directory if it has files
-                    if [ -d ${RESTORE_DIR} ] && [ "\$(ls -A ${RESTORE_DIR})" ]; then
+                    if [ -d "${RESTORE_DIR}" ] && [ "\$(ls -A ${RESTORE_DIR})" ]; then
                         sudo rm -rf ${RESTORE_DIR}/*
                         echo 'Restore directory cleaned.'
                     fi
@@ -56,7 +56,7 @@ pipeline {
                     # Ensure data directory exists and clean it
                     sudo mkdir -p ${DATA_DIR}
                     sudo chmod -R 755 ${DATA_DIR}
-                    if [ -d ${DATA_DIR} ] && [ "\$(ls -A ${DATA_DIR})" ]; then
+                    if [ -d "${DATA_DIR}" ] && [ "\$(ls -A ${DATA_DIR})" ]; then
                         sudo rm -rf ${DATA_DIR}/*
                         echo 'Data directory cleaned.'
                     fi
