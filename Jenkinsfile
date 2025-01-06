@@ -110,7 +110,7 @@ pipeline {
                         ssh ubuntu@${EC2_HOST} 'sudo rm -rf \\${DATA_DIR}/* && \
                         sudo cp \\${RESTORE_DIR}/backup_manifest \\${DATA_DIR} && \
                         sudo tar -xzf \\${RESTORE_DIR}/base.tar.gz -C \\${DATA_DIR} && \
-                        sudo tar -xzf \\${RESTORE_DIR}/pg_wal.tar.gz -C \\${DATA_DIR} && \
+                        sudo tar -xzf \\${RESTORE_DIR}/pg_wal.tar.gz -C \\${DATA_DIR}/pg_wal && \
                         sudo chown -R postgres:postgres \\${DATA_DIR} && echo "Data directory replaced."'
                         """
                     }
