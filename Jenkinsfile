@@ -126,6 +126,16 @@ pipeline {
                 }
             }
         }
+        stage('Start Node') {
+            steps {
+                sshagent(credentials: ['SSH_KEY_CRED']) {
+                    sh """
+                    ssh ubuntu@${EC2_HOST} 'sudo systemctl restart cnode.service && \
+                    sleep 60'
+                    """
+                }
+            }
+        }
         stage('Start PostgreSQL Service') {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
