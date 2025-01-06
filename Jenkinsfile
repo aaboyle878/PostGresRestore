@@ -86,7 +86,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} './git/cardano-db-sync/scripts/postgresql-setup.sh --createdb'
+                    ssh ubuntu@${EC2_HOST} 'source .bashrc && ./git/cardano-db-sync/scripts/postgresql-setup.sh --createdb'
                     """
                 }
             }
