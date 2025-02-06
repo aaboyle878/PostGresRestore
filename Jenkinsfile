@@ -134,7 +134,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
                     ssh ubuntu@${EC2_HOST} 'sudo systemctl restart cnode.service && \
-                    sleep 300'
+                    sleep 420'
                     """
                 }
             }
