@@ -175,34 +175,6 @@ pipeline {
                 }
             }
         }
-        stage('Recreate UTXO View') {
-            steps{
-                sshagent(credentials: ['SSH_KEY_CRED']){
-                    sh """
-                    ssh ubuntu@${EC2_HOST} 'psql cexplorer -c "CREATE OR REPLACE VIEW public.utxo_view
-                    AS
-                    SELECT tx_out.id,
-                        tx_out.tx_id,
-                        tx_out.index,
-                        address.address,
-                        address.has_script AS address_has_script,
-                        address.payment_cred,
-                        tx_out.stake_address_id,
-                        tx_out.value,
-                        tx_out.data_hash,
-                        tx_out.inline_datum_id,
-                        tx_out.reference_script_id,
-                        tx_out.consumed_by_tx_id
-                    FROM tx_out
-                        LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id AND tx_out.index::smallint = tx_in.tx_out_index::smallint
-                        LEFT JOIN tx ON tx.id = tx_out.tx_id
-                        LEFT JOIN address ON address.id = tx_out.address_id
-                        LEFT JOIN block ON tx.block_id = block.id
-                    WHERE tx_in.tx_in_id IS NULL AND block.epoch_no IS NOT NULL AND tx_out.consumed_by_tx_id IS NULL;" && echo "View Recreated"'
-                    """
-                }
-            }
-        }
     }
     post {
         success {
