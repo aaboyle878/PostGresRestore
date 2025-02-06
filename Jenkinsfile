@@ -89,7 +89,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} 'export PGPASSFILE=${PG_PASS} && ./git/cardano-db-sync/scripts/postgresql-setup.sh --createdb'
+                    ssh ubuntu@${EC2_HOST} 'export PGPASSFILE=${PG_PASS} && ./git/cardano-db-sync/scripts/postgresql-setup.sh --recreatedb'
                     """
                 }
             }
