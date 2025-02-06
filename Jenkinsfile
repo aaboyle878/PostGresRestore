@@ -166,15 +166,6 @@ pipeline {
                 }
             }
         }
-        stage('Drop UTXO View') {
-            steps{
-                sshagent(credentials: ['SSH_KEY_CRED']){
-                    sh """
-                    ssh ubuntu@${EC2_HOST} 'psql cexplorer -c "DROP VIEW IF EXISTS public.utxo_view;" && echo "View Dropped"'
-                    """
-                }
-            }
-        }
     }
     post {
         success {
