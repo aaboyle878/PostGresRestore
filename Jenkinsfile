@@ -1,10 +1,10 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'BACKUP_FILE', defaultValue: 'postgres_backup_2024', description: 'Name of the backup file to restore')
+        string(name: 'BACKUP_FILE', defaultValue: '', description: 'Name of the backup file to restore')
     }
     environment {
-        RESTORE_DIR = "/tmp/postgres_restore"
+        RESTORE_DIR = "/opt/cardano/postgres_restore"
         DATA_DIR = "/opt/cardano/cnode/guild-db/pgdb/"
         SLACK_CHANNEL = '#jenkins-notifications'
         LEDGER_DIR = "/opt/cardano/cnode/db"
@@ -58,7 +58,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(3) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} 'aws s3 cp s3://\\${S3_BUCKET}/\\${NETWORK}/\\${BACKUP_FILE}.tar.gz /tmp/ && echo "Backup tarball downloaded."'
+                        ssh ubuntu@${EC2_HOST} 'aws s3 cp s3://\\${S3_BUCKET}/\\${NETWORK}/\\${BACKUP_FILE}.tar.gz /opt/cardano/ && echo "Backup tarball downloaded."'
                         """
                     }
                 }
