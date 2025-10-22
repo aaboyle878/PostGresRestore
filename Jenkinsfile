@@ -70,7 +70,7 @@ pipeline {
                     retry(2) {
                         sh """
                         ssh ubuntu@${EC2_HOST} 'sudo mkdir -p \\${RESTORE_DIR} && \
-                        sudo tar -xzf /tmp/\\${BACKUP_FILE}.tar.gz -C \\${RESTORE_DIR} && echo "Backup tarball extracted."'
+                        sudo tar -xzf /opt/cardano/\\${BACKUP_FILE}.tar.gz -C \\${RESTORE_DIR} && echo "Backup tarball extracted."'
                         """
                     }
                 }
