@@ -58,7 +58,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     retry(3) {
                         sh """
-                        ssh ubuntu@${EC2_HOST} 'aws s3 cp s3://\\${S3_BUCKET}/\\${NETWORK}/\\${BACKUP_FILE}.tar.gz /opt/cardano/ && echo "Backup tarball downloaded."'
+                        ssh ubuntu@${EC2_HOST} 'sudo -E aws s3 cp s3://\\${S3_BUCKET}/\\${NETWORK}/\\${BACKUP_FILE}.tar.gz /opt/cardano/ && echo "Backup tarball downloaded."'
                         """
                     }
                 }
