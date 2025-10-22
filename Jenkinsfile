@@ -76,6 +76,17 @@ pipeline {
                 }
             }
         }
+        stage{
+            steps{
+                sshagent(credentials: ['SSH_KEY_CRED']){
+                    retry (2) {
+                        sh """
+                        ssh ubunutu@${EC@_HOST} 'sudo rm /opt/cardano/\\${BACKUP_FILE}.tar.gz && echo "Tarball removed to free space."'
+                        """
+                    }
+                }
+            }
+        }
         stage('Stop DB-Sync Service') {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
@@ -206,7 +217,7 @@ pipeline {
         }
         always {
             sshagent(credentials: ['SSH_KEY_CRED']) {
-                sh "ssh ubuntu@${EC2_HOST} 'rm -rf \\${RESTORE_DIR} /opt/cardano/\\${BACKUP_FILE}.tar.gz'"
+                sh "ssh ubuntu@${EC2_HOST} 'rm -rf \\${RESTORE_DIR}'"
             }
         }
     }
