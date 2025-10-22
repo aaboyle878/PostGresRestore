@@ -42,7 +42,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
-                    ssh ubuntu@${EC2_HOST} 'mkdir -p \\${RESTORE_DIR} && \
+                    ssh ubuntu@${EC2_HOST} 'sudo mkdir -p \\${RESTORE_DIR} && \
                     if [ -d \\${RESTORE_DIR} ] && [ "\\\$(ls -A \\${RESTORE_DIR})" ]; then \
                         rm -rf \\${RESTORE_DIR}/* && echo "Restore directory cleaned.";\
                     fi && \
