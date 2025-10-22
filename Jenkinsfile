@@ -134,7 +134,7 @@ pipeline {
                 sshagent(credentials: ['SSH_KEY_CRED']) {
                     sh """
                     ssh ubuntu@${EC2_HOST} 'sudo systemctl restart cnode.service && \
-                    sleep 600'
+                    sleep 90m'
                     """
                 }
             }
@@ -206,7 +206,7 @@ pipeline {
         }
         always {
             sshagent(credentials: ['SSH_KEY_CRED']) {
-                sh "ssh ubuntu@${EC2_HOST} 'rm -rf \\${RESTORE_DIR} /tmp/\\${BACKUP_FILE}.tar.gz'"
+                sh "ssh ubuntu@${EC2_HOST} 'rm -rf \\${RESTORE_DIR} /opt/cardano/\\${BACKUP_FILE}.tar.gz'"
             }
         }
     }
